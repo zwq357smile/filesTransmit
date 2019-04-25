@@ -40,6 +40,7 @@
         localStorage.setItem('thisDir', JSON.stringify(this.thisDir));
         this.creatQrCode();
       },
+// 创建二维码
       creatQrCode() {
         let port;
         let timestamp = new Date().getTime();
