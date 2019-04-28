@@ -1,5 +1,11 @@
 import axios from 'axios';
 import qs from 'qs';
+/**
+ *  config = {host: 'localhost',
+    port: '8033',
+    requestPort: '8034'
+    }
+ */
 import config from '@/js/config';
 
 axios.defaults.timeout = 5000;

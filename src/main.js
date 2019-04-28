@@ -1,8 +1,10 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+/**
+ * 项目的入口文件
+ */
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+// rem的计算规则
 import flexible from '@/js/flexible'
 Vue.config.productionTip = false;
 

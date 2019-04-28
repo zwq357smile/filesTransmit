@@ -48,10 +48,12 @@
         </ul>
       </template>
       <div v-else class="prevent">当前会话已过期，请扫描新二维码！</div>
+      <router-link to="/upload" class="upload-file">上传文件至电脑</router-link>
     </div>
 </template>
 
 <script>
+// 封装url参数
   import GetParams from '@/js/getParams';
   import LoadDir from '@/api/mobile/loadDir';
   import config from '@/js/config'
@@ -286,5 +288,18 @@
     font-size: 1.6rem;
     line-height: 3rem;
     float: left;
+  }
+  .upload-file {
+    position: fixed;
+    font-size: .8rem;
+    bottom: 10px;
+    right: 10px;
+    width: 7rem;
+    height: 2rem;
+    line-height: 2rem;
+    color: #fff;
+    background: rgb(92, 206, 92);
+    border-radius: 5px;
+    text-decoration: none;
   }
 </style>
