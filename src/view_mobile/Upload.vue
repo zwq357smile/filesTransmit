@@ -1,46 +1,57 @@
 <template>
   <div>
     <header class="title-bar">
-      <span class="goback" @click="goback">返回</span>
+      <span class="iconfont title-bar-back" @click="goback">&#xe6ed;</span>
       <span>上传文件</span>
-      <span class="submit" @click="uploadFiles">提交</span>
+      <span class="submit" @click="$refs.upload.click()">
+        <input class="submit-upload" ref="upload" type="file" @change="handleInputChange">
+      </span>
     </header>
     <div class="content">
-      <div class="input-wrapper">
-        选择要上传的文件
-        <input type="file" multiple @change="handleInputChange">
-      </div>
       <ul class="input-list">
-        <li v-for="(item,index) in this.fileNames" :key="index">{{ item }}</li>
+        <li v-for="(item, index) in this.fileNames" :key="index">{{ item }}</li>
       </ul>
     </div>
   </div>
 </template>
 
 <script>
+import FileUpload from '@/api/mobile/upload';
+import config from '@/js/config'
 export default {
   name: 'Upload',
   data() {
     return {
       files: [],
-      fileNames: []
+      fileNames: [],
+      host: ''
     };
   },
+  created() {
+    this.host = /http:\/\/\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}:(?=\d{4}\/#)/.exec(location.href)[0];
+  },
   methods: {
-    goback () {
+    goback() {
       this.$router.go(-1)
     },
-    handleInputChange (e) {
+    handleInputChange(e) {
       this.files = [];
-      this.fileNames = [];
-      let files = e.target.files;
-      for (let item of files) {
+      let files = e.target.files[0];
+      this.uploadFiles(files);
+      this.fileNames.push(files['name']);
+      /* for (let item of files) {
         this.fileNames.push(item['name']);
         this.files.push(item);
-      }
+      } */
     },
-    uploadFiles () {
-      console.log('upload')
+    uploadFiles(data) {
+      let fileData = new FormData();
+      fileData.append('uploadFile', data);
+      fileData.append('name', this.$route.query.path);
+      FileUpload(fileData, this.progress, this.host + config.requestPort);
+    },
+    progress(percent) {
+      console.log(percent);
     }
   }
 };
@@ -58,50 +69,47 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  line-height: 2.4rem;
   font-size: .8rem;
   padding: 0 .4rem;
   border-bottom: 1px solid #f7f7f7;
-  padding: 8px 0;
 }
-.title-bar .goback {
-  width: 3rem;
-  height: 1.5rem;
-  line-height: 1.5rem;
-  border: 1px solid #ccc;
-  background: rgb(92, 206, 92);
-  border-radius: 5px;
-  color: #fff;
+.submit-upload{
+  display: none;
 }
 .title-bar .submit {
-  width: 3rem;
-  height: 1.5rem;
-  line-height: 1.5rem;
-  border: 1px solid #ccc;
-  background: rgb(92, 206, 92);
-  border-radius: 5px;
-  color: #fff;
+  width: 1.7rem;
+  height: 1.7rem;
+  position: relative;
+}
+.title-bar .submit:before{
+  content: '';
+  width: .7rem;
+  height: 2px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  border-radius: 4px;
+  background-color: #575757;
+}
+.title-bar .submit:after{
+  content: '';
+  width: 2px;
+  height: .7rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  border-radius: 4px;
+  background-color: #575757;
 }
 .content {
   margin-top: 2.4rem;
-}
-.input-wrapper {
-  width: 60%;
-  height: 2rem;
-  line-height: 2rem;
-  text-align: center;
-  background: rgb(162, 192, 238);
-  position: relative;
-  border-radius: 5px;
-  color: rgb(64, 103, 211);
-}
-.input-wrapper input {
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: block;
-  width: 100%;
-  height: 2rem;
-  opacity: 0;
 }
 .input-list {
   padding: 0;
@@ -115,4 +123,10 @@ export default {
   padding: 5px 0;
   margin-bottom: 2px;
 }
+  .title-bar-back{
+    width: 1.8rem;
+    color: #575757;
+    font-size: 1.5rem;
+    text-align: left;
+  }
 </style>

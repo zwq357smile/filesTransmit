@@ -18,8 +18,8 @@ function flexible() {
 
     if (width && height) {
       // 兼容横竖屏
-      var baseLenth = height > width ? width : height;
-      docEle.style.fontSize = 20 * (baseLenth / 375) + 'px'
+      // var baseLenth = height > width ? width : height;
+      docEle.style.fontSize = 20 * (width / 375) + 'px'
     }
   };
 

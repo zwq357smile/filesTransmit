@@ -7,8 +7,7 @@ export default function (url, name, baseUrl = 'http://localhost') {
       params: {
         url: url,
         name: name
-      },
-      responseType: 'blob'
+      }
     }).then((res) => {
       resolve(res);
     })

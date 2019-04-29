@@ -5,6 +5,7 @@ const ip = require('./js/ipAddress');
 
 // 跨域设置,路由拦截
 app.all('*', function (req, res, next) {
+  console.log(req.path);
   if (req.path !== '/') {
     res.header('Access-Control-Allow-Credentials', true);
     // 这里获取 origin 请求头 而不是用 *
@@ -22,6 +23,10 @@ app.use('/r', require('./api/getIP'));
 app.use('/file', require('./api/getImage'));
 app.use('/file', require('./api/download'));
 app.use('/token', require('./api/setToken'));
+app.use('/file', require('./api/upload'));
+app.get('/', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../dist/index.html'))
+});
 app.use(express.static(path.resolve(__dirname, '../dist')));
 
 app.listen(8034, () => {

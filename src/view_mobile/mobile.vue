@@ -1,54 +1,51 @@
 <template>
     <div class="mobile-wrap">
-      <template v-if="isCorrect">
-        <header class="title-bar">
-          <div class="iconfont title-bar-back"
-               @click="back"
-               v-if="history.length > 1 && !multiple">
-            &#xe6ed;
-          </div>
-          <div id="download-btn" class="iconfont mul-select"
-               @click="mulDownload"
-               v-if="multiple">
-            下载
-          </div>
-          <div class="title-bar-back" v-else></div>
-          <div class="title-content">{{dirname}}</div>
-          <div class="mul-select"
-               @click="multiple = true"
-               v-if="!multiple">多选
-          </div>
-          <div class="mul-select"
-               @click="multiple = false; selectData = {}"
-               v-else>取消
-          </div>
-        </header>
-        <ul class="content-wrap">
-          <li v-for='(item, index) in dirList'
-              :key="item.filename"
-              class="content-list"
-              @click="openIt(item, index)">
-            <img class="file-type" v-if="item.type === 'image'" :src="`${host}${port}/file/download?url=${item.path}`">
-            <div :class="`${item.type}-icon iconfont file-type`" v-else></div>
-            <div class="dir-content">
-              <div class="dir-info">
-                <div class="dir-info-name">{{item.filename}}</div>
-                <div class="dir-info-date">{{item.date.split('T')[0]}}</div>
-              </div>
-              <div class="iconfont dir-detail" v-if="item.type === 'dir'">&#xe6ec;</div>
-              <!--<div class="iconfont mul-select-icon" v-show="multiple && item.type !== 'dir'"></div>-->
-              <radio class="mul-select-icon"
-                     :width="'.7rem'"
-                     :height="'.7rem'"
-                     v-model="selectData[index]"
-                     v-show="multiple && item.type !== 'dir'">
-              </radio>
+      <header class="title-bar">
+        <div class="iconfont title-bar-back"
+             @click="back"
+             v-if="history.length > 1 && !multiple">
+          &#xe6ed;
+        </div>
+        <div id="download-btn" class="iconfont mul-select"
+             @click="mulDownload"
+             v-if="multiple">
+          下载
+        </div>
+        <div class="title-bar-back" v-else></div>
+        <div class="title-content">{{dirname}}</div>
+        <div class="mul-select"
+             @click="multiple = true"
+             v-if="!multiple">多选
+        </div>
+        <div class="mul-select"
+             @click="multiple = false; selectData = {}"
+             v-else>取消
+        </div>
+      </header>
+      <ul class="content-wrap">
+        <li v-for='(item, index) in dirList'
+            :key="item.filename"
+            class="content-list"
+            @click="openIt(item, index)">
+          <img class="file-type" v-if="item.type === 'image'" :src="`${host}${port}/file/download?url=${item.path}`">
+          <div :class="`${item.type}-icon iconfont file-type`" v-else></div>
+          <div class="dir-content">
+            <div class="dir-info">
+              <div class="dir-info-name">{{item.filename}}</div>
+              <div class="dir-info-date">{{item.date.split('T')[0]}}</div>
             </div>
-          </li>
-        </ul>
-      </template>
-      <div v-else class="prevent">当前会话已过期，请扫描新二维码！</div>
-      <router-link to="/upload" class="upload-file">上传文件至电脑</router-link>
+            <div class="iconfont dir-detail" v-if="item.type === 'dir'">&#xe6ec;</div>
+            <!--<div class="iconfont mul-select-icon" v-show="multiple && item.type !== 'dir'"></div>-->
+            <radio class="mul-select-icon"
+                   :width="'.7rem'"
+                   :height="'.7rem'"
+                   v-model="selectData[index]"
+                   v-show="multiple && item.type !== 'dir'">
+            </radio>
+          </div>
+        </li>
+      </ul>
+      <router-link :to="{path: '/upload', query: {path: path}}" class="upload-file">上传文件至该目录</router-link>
     </div>
 </template>
 
@@ -57,8 +54,6 @@
   import GetParams from '@/js/getParams';
   import LoadDir from '@/api/mobile/loadDir';
   import config from '@/js/config'
-  import token from '@/api/pc/setToken'
-  // import downLoad from '@/api/mobile/download'
   import radio from '@/components/radio.vue'
   export default {
     name: 'mobile',
@@ -69,9 +64,9 @@
         dirList: [],
         history: [],
         port: config.requestPort,
-        isCorrect: false,
         multiple: false,
-        selectData: {}
+        selectData: {},
+        path: ''
       }
     },
     components: {
@@ -79,10 +74,8 @@
     },
     created() {
       let info = GetParams(location.href);
+      this.path = info.path;
       this.host = /http:\/\/\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}:(?=\d{4}\/#)/.exec(location.href)[0];
-      token(null, this.host + config.requestPort).then(token => {
-        if (Number(info.token) === token) this.isCorrect = true
-      });
       this.history.unshift(info);
       this.loadDir(info.path, info.filename);
     },
@@ -90,10 +83,10 @@
       openIt({path, type, filename}, index) {
         if (this.multiple) {
           this.$set(this.selectData, index, !this.selectData[index]);
-          // this.selectData[index] = !this.selectData[index]
           return;
         }
         if (type === 'dir') {
+          this.$store.dispatch('pushState', location.href);
           this.history.unshift({path, filename});
           this.loadDir(path, filename);
         } else {
@@ -102,6 +95,7 @@
       },
       back() {
         this.history.shift();
+        this.$store.dispatch('popState');
         this.loadDir(this.history[0].path, this.history[0].filename);
       },
       loadDir(path, name) {
