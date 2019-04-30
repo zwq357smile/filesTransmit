@@ -27,7 +27,7 @@ axios.interceptors.request.use(function (request) {
         request.data[item] = JSON.stringify(request.data[item]);
       }
     }
-    request.data = qs.stringify(request.data);
+    if (!request.url.match(/upload$/)) request.data = qs.stringify(request.data);
   }
   return request;
 }, function (error) {
