@@ -292,7 +292,7 @@
     height: 2rem;
     line-height: 2rem;
     color: #fff;
-    background: rgb(92, 206, 92);
+    background: rgb(51, 168, 198);
     border-radius: 5px;
     text-decoration: none;
   }

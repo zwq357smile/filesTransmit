@@ -9,7 +9,11 @@
     </header>
     <div class="content">
       <ul class="input-list">
-        <li v-for="(item, index) in this.fileNames" :key="index">{{ item }}</li>
+        <li v-for="(item, index) in this.fileNames" :key="index" class="list-item" :style="{ backgroundColor: item.bgc }">
+          <span>{{item.name}}</span>
+          <span v-show="!item.finish" class="progress-bar" :style="{ width: uploadProgress }"></span>
+          <span v-show="!item.finish" class="progress-percent">{{ uploadProgress }}</span>
+        </li>
       </ul>
     </div>
   </div>
@@ -22,9 +26,10 @@ export default {
   name: 'Upload',
   data() {
     return {
-      files: [],
       fileNames: [],
-      host: ''
+      host: '',
+      uploadProgress: '',
+      item: {}
     };
   },
   created() {
@@ -35,10 +40,13 @@ export default {
       this.$router.go(-1)
     },
     handleInputChange(e) {
-      this.files = [];
+      this.item = {};
       let files = e.target.files[0];
+      this.$set(this.item, 'name', files['name']);
+      this.$set(this.item, 'finish', false);
+      this.$set(this.item, 'bgc', '#fff');
+      this.fileNames.push(this.item);
       this.uploadFiles(files);
-      this.fileNames.push(files['name']);
       /* for (let item of files) {
         this.fileNames.push(item['name']);
         this.files.push(item);
@@ -51,7 +59,12 @@ export default {
       FileUpload(fileData, this.progress, this.host + config.requestPort);
     },
     progress(percent) {
-      console.log(percent);
+      console.log(percent)
+      if (percent === '100%') {
+        this.$set(this.item, 'finish', true);
+        this.$set(this.item, 'bgc', 'rgb(51, 168, 198)');
+      }
+      this.uploadProgress = percent;
     }
   }
 };
@@ -116,17 +129,28 @@ export default {
 }
 .input-list li {
   list-style: none;
-  background: rgb(162, 192, 238);
-  border: 1px solid rgb(64, 103, 211);
-  color: #fff;
+  /* background: rgb(162, 192, 238); */
+  border: 1px solid rgb(51, 168, 198);
+  color: #000;
   border-radius: 5px;
   padding: 5px 0;
   margin-bottom: 2px;
+  position: relative;
+  font-size: .8rem;
 }
-  .title-bar-back{
-    width: 1.8rem;
-    color: #575757;
-    font-size: 1.5rem;
-    text-align: left;
-  }
+.title-bar-back{
+  width: 1.8rem;
+  color: #575757;
+  font-size: 1.5rem;
+  text-align: left;
+}
+.list-item .progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50px;
+  background-color: rgb(51, 168, 198);
+  opacity: .4;
+  height: 100%;
+}
 </style>
