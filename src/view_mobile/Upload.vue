@@ -9,7 +9,10 @@
     </header>
     <div class="content">
       <ul class="input-list">
-        <li v-for="(item, index) in this.fileNames" :key="index">{{ item }}</li>
+        <li v-for="item in this.fileNames" :key="item.name">
+          {{ item.name }}
+          <div class="progress-bg" :style="{transform: item.progress}"></div>
+        </li>
       </ul>
     </div>
   </div>
@@ -37,21 +40,20 @@ export default {
     handleInputChange(e) {
       this.files = [];
       let files = e.target.files[0];
-      this.uploadFiles(files);
-      this.fileNames.push(files['name']);
-      /* for (let item of files) {
-        this.fileNames.push(item['name']);
-        this.files.push(item);
-      } */
+      let item = {name: files['name'], progress: 0};
+      this.fileNames.push(item);
+      this.uploadFiles(files, item);
     },
-    uploadFiles(data) {
+    uploadFiles(data, item) {
       let fileData = new FormData();
       fileData.append('uploadFile', data);
       fileData.append('name', this.$route.query.path);
-      FileUpload(fileData, this.progress, this.host + config.requestPort);
-    },
-    progress(percent) {
-      console.log(percent);
+      FileUpload(fileData, progress.bind(item, this), this.host + config.requestPort);
+      function progress(that, percent) {
+        console.log(percent)
+        that.$set(this, 'progress', `translate3d(${percent - 100}%, 0, 0)`);
+        console.log(that.fileNames)
+      }
     }
   }
 };
@@ -116,17 +118,23 @@ export default {
 }
 .input-list li {
   list-style: none;
-  background: rgb(162, 192, 238);
-  border: 1px solid rgb(64, 103, 211);
-  color: #fff;
-  border-radius: 5px;
-  padding: 5px 0;
-  margin-bottom: 2px;
+  border-bottom: 1px solid #eee;
+  color: #6f6f6f;
+  height: 2rem;
+  line-height: 2rem;
+  font-size: .8rem;
+  text-align: left;
+  text-indent: .9rem;
 }
   .title-bar-back{
     width: 1.8rem;
     color: #575757;
     font-size: 1.5rem;
     text-align: left;
+  }
+  .progress-bg{
+    transform: translate3d(-100%, 0, 0);
+    background-color: #13ec61;
+    height: 2px;
   }
 </style>

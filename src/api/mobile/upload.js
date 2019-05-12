@@ -6,7 +6,7 @@ export default function (data, clb, baseUrl = 'http://localhost') {
       baseURL: baseUrl,
       timeout: 6000000,
       onUploadProgress: function (e) {
-        clb(parseInt(e.loaded / e.total * 100) + '%');
+        clb(parseInt(e.loaded / e.total * 100));
       }
     }).then((res) => {
       resolve(res);
